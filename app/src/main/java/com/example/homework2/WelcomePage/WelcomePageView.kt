@@ -3,10 +3,13 @@ package com.example.myapplication.view
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
+import android.media.Image
 import android.os.Looper
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -69,7 +72,6 @@ private val permissions = arrayOf(
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-
 fun WelcomeScreen(
     context: Context,
     fusedLocationClient: FusedLocationProviderClient,
@@ -122,9 +124,21 @@ fun WelcomeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Settings") },
+                title = {  },
                 navigationIcon = {
-                    // Your navigation icon
+                    Button(
+                        onClick = {
+                            navController.navigate("settings_screen")
+                        },
+                        modifier = Modifier.padding(start = 16.dp) // Change position
+                    ) {
+                        Text(
+                            text = "Configurations", // Change title
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Gray // Change color
+                        )
+                    }
                 }
             )
         },
@@ -138,18 +152,24 @@ fun WelcomeScreen(
             ) {
                 Spacer(modifier = modifier.size(50.dp))
                 Text(
-                    text = "Welcome to our City Explorer App!",
-                    fontSize = 16.sp,
-                    color = Color.Magenta // Change color
+                    text = "Welcome!",
+                    fontSize = 24.sp,
+                    color = Color.Magenta, // Change color
+                    fontWeight = FontWeight.Bold // Change font weight
                 )
                 Spacer(modifier = modifier.size(50.dp))
                 Button(
                     onClick = {
                         navController.navigate("second_screen")
                     },
-                    modifier = modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .padding(16.dp) // Change padding
                 ) {
-                    Text(text = "Explore Cities", color = Color.Green) // Change color
+                    Text(
+                        text = "Cities List", // Change title
+                        fontSize = 18.sp,
+                        color = Color.Green // Change color
+                    )
                 }
 
                 Spacer(modifier = modifier.size(20.dp))
@@ -161,7 +181,6 @@ fun WelcomeScreen(
                                 it
                             ) == PackageManager.PERMISSION_GRANTED
                         }) {
-                        GoogleMapView(cameraPositionState, marker)
                     } else {
                         launchMultiplePermissions.launch(permissions)
                     }
@@ -174,7 +193,7 @@ fun WelcomeScreen(
                     Spacer(modifier = modifier.size(10.dp))
                     LocationScreen(context, fusedLocationClient, currentLocation)
                 }
-                Spacer(modifier = modifier.size(15.dp))
+                Spacer(modifier = modifier.size(5.dp))
                 Button(onClick = {
                     if (permissions.all {
                             ContextCompat.checkSelfPermission(
@@ -187,31 +206,15 @@ fun WelcomeScreen(
                         launchMultiplePermissions.launch(permissions)
                     }
                 }) {
-                    Text(text = "Get location and Temperature", color = Color.Cyan) // Change color
+                    Text(
+                        text = "Measure", // Change title
+                        fontSize = 16.sp,
+                        color = Color.Cyan // Change color
+                    )
                 }
             }
         }
     )
-}
-
-@Composable
-fun GoogleMapView(cameraPositionState: CameraPositionState, marker: LatLng) {
-    GoogleMap(
-        modifier = Modifier.size(500.dp),
-        cameraPositionState = cameraPositionState,
-        properties = MapProperties(
-            isMyLocationEnabled = true,
-            mapType = MapType.HYBRID,
-            isTrafficEnabled = true
-        )
-    ) {
-        Marker(
-            state = MarkerState(position = marker),
-            title = "MyPosition",
-            snippet = "This is a description of this Marker",
-            draggable = true
-        )
-    }
 }
 
 @Composable
@@ -227,17 +230,17 @@ fun Temperature(tempUnit: Temperature, weatherResponse: WeatherDTO?) {
         }
         Text(
             text = "$temp",
-            fontSize = 24.sp,
+            fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(end = 4.dp),
+            modifier = Modifier.padding(end = 8.dp),
             color = Color.Red // Change color
         )
 
         Text(
             text = tempUnit.formatTemperature(),
-            fontSize = 16.sp,
+            fontSize = 18.sp,
             fontWeight = FontWeight.Normal,
-            modifier = Modifier.padding(bottom = 4.dp),
+            modifier = Modifier.padding(bottom = 8.dp),
             color = Color.Yellow // Change color
         )
     }
@@ -267,7 +270,7 @@ fun LocationScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Your location: ${currentLocation.latitude}/${currentLocation.longitude}",
+                text = "Your Location: ${currentLocation.latitude}/${currentLocation.longitude}",
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 color = Color.Gray // Change color
             )
@@ -293,6 +296,7 @@ fun startLocationUpdates(fusedLocationClient: FusedLocationProviderClient) {
         )
     }
 }
+
 
 
 fun getTempInCurrentCity(coord: LatLng, viewModel: WelcomeViewModel) {
