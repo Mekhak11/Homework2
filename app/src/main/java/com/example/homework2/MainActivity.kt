@@ -21,44 +21,44 @@ import androidx.navigation.compose.rememberNavController
 import com.example.homework2.ui.theme.Homework2Theme
 import androidx.navigation.compose.composable
 import com.example.homework2.CityList.CityListView
+import com.example.homework2.Settings.SettingsView
 
+import com.example.myapplication.view.WelcomeScreen
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+
+
+private const val LOCATION_PERMISSION_REQUEST_CODE = 34
 
 class MainActivity : ComponentActivity() {
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
         setContent {
-            val navController = rememberNavController()
-            Homework2Theme {
+                val navController = rememberNavController()
+
                 NavHost(
                     navController = navController,
-                    startDestination = "firstView") {
-                    composable("firstView") {
-                        FirstViewContent(navController)
+                    startDestination = "welcome_screen"
+                ) {
+                    composable("welcome_screen") {
+                        WelcomeScreen(
+                            context = this@MainActivity,
+                            fusedLocationClient = fusedLocationClient,
+                            navController = navController
+                        )
                     }
-                    composable("cityList") {
-                        CityListView(navController)
+                    composable("second_screen") {
+                        CityListView(navController = navController, context = this@MainActivity)
+                    }
+                    composable("settings_screen") {
+                        SettingsView(navController = navController, context = this@MainActivity)
                     }
                 }
-            }
-        }
-    }
-}
 
-@Composable
-fun FirstViewContent(navController: NavHostController) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("Hello User!")
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = {
-            navController.navigate("cityList")
-        }) {
-            Text("Click Me!")
         }
     }
 }
